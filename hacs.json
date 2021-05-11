@@ -1,0 +1,8 @@
+{
+  "name": "Taiwan ANWS",
+  "render_readme": true,
+  "domain": "aoaws_anws",
+  "documentation": "https://github.com/tsunglung/TwANWS",
+  "issue_tracker": "https://github.com/tsunglung/TwANWS/issues",
+  "homeassistant": "2021.4.0"
+}

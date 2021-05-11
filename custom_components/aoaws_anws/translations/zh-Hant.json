@@ -1,0 +1,31 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "\u670d\u52d9\u5df2\u7d93\u8a2d\u5b9a\u5b8c\u6210"
+        },
+        "error": {
+            "cannot_connect": "\u9023\u7dda\u5931\u6557",
+            "unknown": "\u672a\u9810\u671f\u932f\u8aa4"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "api_key": "API \u5bc6\u9470",
+                    "language": "\u8a9e\u8a00",
+                    "location_name": "\u6c23\u8c61\u89c0\u6e2c\u7ad9"
+                },
+                "description": "\u8acb\u9078\u64c7\u6700\u8fd1\u7684\u6c23\u8c61\u89c0\u6e2c\u7ad9\u3002",
+                "title": "\u9023\u7dda\u81f3 \u822a\u7a7a\u6c23\u8c61\u670d\u52d9\u7db2"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "language": "\u8a9e\u8a00"
+                }
+            }
+        }
+    }
+}
