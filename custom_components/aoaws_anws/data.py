@@ -92,6 +92,11 @@ class AnwsAoawseData:
 
     def get_observations_for_site(self, site, data):
         """ return observation """
+        self._update_site()
+        return self._convert_to_observation(site, data)
+
+    def _convert_to_observation(self, site, data):
+        """ converter  """
         for i in data:
             for j in i:
                 if j == site:
@@ -170,7 +175,6 @@ class AnwsAoawseData:
             _LOGGER.error("Failed fetching data for %s", self.site_name)
             return
 
-
         if req.status_code == HTTP_OK:
             self.data = self._parser_html(req.text)
             for i in self.data:
@@ -178,7 +182,7 @@ class AnwsAoawseData:
                     if self._site in j:
                         self.site_name = self._site
         else:
-            _LOGGER.error("Received error from ANWS AOAWS: %s", err)
+            _LOGGER.error("Received error from ANWS AOAWS: %s", self.site_name)
             self.site_name = None
             self.now = None
 
