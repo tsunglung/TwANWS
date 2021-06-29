@@ -49,7 +49,8 @@ ANWS_AOAWS_MONITORED_CONDITIONS = "anws_aoaws_monitored_conditions"
 ANWS_AOAWS_NAME = "anws_aoaws_name"
 
 USER_AGENT = ""
-HA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
+HA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
+    "(KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
 BASE_URL = 'https://aoaws.anws.gov.tw/AWS/mainRight.php?lang={}&voice_alarm=0&state=Taiwan'
 
 REQUEST_TIMEOUT = 10  # seconds
@@ -88,28 +89,28 @@ WEATHER_CODES = {
     "Fog": "6",
     "Cloudy": "7",
     "Overcast": "8",
-    "Mist": "8",
+    "Mist ": "8",
     "VCTS Mist": "9",
     "Shower Mist": "10",
     "Drizzle": "11",
     "Rain": "12",
     "Heavy rain shower": "13",
-    "Heavy rain shower": "14",
+    "Heavy rain shower ": "14",
     "Heavy rain": "15",
     "Sleet shower": "16",
-    "Sleet shower": "17",
+    "Sleet shower ": "17",
     "Sleet": "18",
     "Hail shower": "19",
-    "Hail shower": "20",
+    "Hail shower ": "20",
     "Hail": "21",
     "Shower": "22",
     "Light snow shower": "23",
     "Light snow": "23",
     "Heavy snow shower": "25",
-    "Heavy snow shower": "26",
+    "Heavy snow shower ": "26",
     "Heavy snow": "27",
     "Thunder shower": "28",
-    "Thunder shower": "29",
+    "Thunder shower ": "29",
     "Thunder": "30"
 }
 
@@ -143,7 +144,7 @@ VISIBILITY_CLASSES = {
 # Sensor types are defined as:
 #   variable -> [0]title, [1]device_class, [2]units, [3]icon, [4]enabled_by_default
 SENSOR_TYPES = {
-#    "name": ["Station Name", None, None, "mdi:label-outline", False],
+    # "name": ["Station Name", None, None, "mdi:label-outline", False],
     "weather": [
         "Weather",
         None,
@@ -160,7 +161,7 @@ SENSOR_TYPES = {
         True,
     ],
     "wind_direction": ["Wind Direction", None, None, "mdi:compass-outline", True],
-#    "wind_gust": ["Wind Gust", None, SPEED_MILES_PER_HOUR, "mdi:weather-windy", False],
+    # "wind_gust": ["Wind Gust", None, SPEED_MILES_PER_HOUR, "mdi:weather-windy", False],
     "visibility": ["Visibility", None, None, "mdi:eye", True],
     "visibility_distance": [
         "Visibility Distance",
@@ -169,14 +170,13 @@ SENSOR_TYPES = {
         "mdi:eye",
         True,
     ],
-#    "uv": ["UV Index", None, UV_INDEX, "mdi:weather-sunny-alert", False],
-#    "precipitation": [
-#        "Probability of Precipitation",
-#        None,
-#        PERCENTAGE,
-#        "mdi:weather-rainy",
-#        False,
-#    ],
-#    "humidity": ["Humidity", DEVICE_CLASS_HUMIDITY, PERCENTAGE, None, False],
+    # "uv": ["UV Index", None, UV_INDEX, "mdi:weather-sunny-alert", False],
+    # "precipitation": [
+    #     "Probability of Precipitation",
+    #     None,
+    #     PERCENTAGE,
+    #     "mdi:weather-rainy",
+    #     False,
+    # ],
+    # "humidity": ["Humidity", DEVICE_CLASS_HUMIDITY, PERCENTAGE, None, False],
 }
-

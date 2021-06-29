@@ -95,4 +95,3 @@ def _get_config_value(config_entry, key, default):
     if config_entry.options:
         return config_entry.options.get(key, default)
     return config_entry.data.get(key, default)
-

@@ -22,8 +22,8 @@ from .const import (
     REQUEST_TIMEOUT
 )
 
-
 _LOGGER = logging.getLogger(__name__)
+
 
 class Element():
     def __init__(self, field_code=None, value=None, units=None, text=None):
@@ -101,11 +101,14 @@ class AnwsAoawseData:
             for j in i:
                 if j == site:
                     metar = i[26].split(" ")
+                    for k in range(len(i)):
+                        i[k] = re.sub(
+                            "<font color=\\#999999\\>|<font color=\\\\#999999\\\\>|</font>", "", i[k])
+
                     observation = Observation()
                     # date
-                    dt = re.sub("<font color=\#999999\>|<font color=\\\\#999999\\\\>|</font>", "", i[10])
                     timestamp = int(time.mktime((datetime.strptime(
-                        dt.strip(), "%Y-%m-%d %H:%M %Z") + timedelta(hours=8)).timetuple()))
+                        i[10].strip(), "%Y-%m-%d %H:%M %Z") + timedelta(hours=8)).timetuple()))
                     observation.date = datetime.fromtimestamp(
                         timestamp).strftime('%Y-%m-%d %H:%M:%S')
                     # wether
@@ -156,7 +159,7 @@ class AnwsAoawseData:
             results = icaos.find_all(language="JavaScript")
             if results:
                 results2 = [re.sub(
-                    "addarray\(|\)|'", "", i.string) for i in results]
+                    "addarray(|)|'", "", i.string) for i in results]
                 for i in results2:
                     value = i.split(",")
                     data.append(value)
