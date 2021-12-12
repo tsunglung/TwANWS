@@ -4,16 +4,10 @@ import logging
 import re
 import time
 from datetime import datetime, timedelta
-
+from http import HTTPStatus
 from aiohttp.hdrs import USER_AGENT
 import requests
 from bs4 import BeautifulSoup
-
-from homeassistant.const import (
-    HTTP_OK,
-    HTTP_FORBIDDEN,
-    HTTP_NOT_FOUND,
-)
 
 from .const import (
     BASE_URL,
@@ -178,7 +172,7 @@ class AnwsAoawseData:
             _LOGGER.error("Failed fetching data for %s", self.site_name)
             return
 
-        if req.status_code == HTTP_OK:
+        if req.status_code == HTTPStatus.OK:
             self.data = self._parser_html(req.text)
             for i in self.data:
                 for j in i:
