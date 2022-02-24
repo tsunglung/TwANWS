@@ -8,7 +8,10 @@ from http import HTTPStatus
 from aiohttp.hdrs import USER_AGENT
 import requests
 from bs4 import BeautifulSoup
-
+from homeassistant.const import (
+    LENGTH_KILOMETERS,
+    LENGTH_METERS
+)
 from .const import (
     BASE_URL,
     WEATHER_CODES,
@@ -117,7 +120,10 @@ class AnwsAoawseData:
                     unit = ''.join(c for c in i[19] if not c.isdigit())
                     observation.temperature = Element("T", value=value, units=unit)
                     # wind speed
-                    value = int(''.join(c for c in i[13] if c.isdigit()))
+                    if 'Gust' in i[13] or '陣風' in i[13]:
+                        value = int(''.join(c for c in i[13].lstrip().split("陣風").split("Gust")[0] if c.isdigit()))
+                    else:
+                        value = int(''.join(c for c in i[13] if c.isdigit()))
                     unit = ''.join(c for c in i[13] if not c.isdigit())
                     observation.wind_speed = Element("W", value=value, units=unit)
                     # wind direction
@@ -128,13 +134,21 @@ class AnwsAoawseData:
                     unit = ''.join(c for c in i[12] if not c.isdigit())
                     observation.wind_direction = Element("W", value=value, units=unit)
                     # visibility
+                    i[14] = i[14].replace("&nbsp;", " ")
                     unit = ''.join(c for c in i[14] if not c.isdigit())
-                    value = i[14].replace("&nbsp;", " ")
-                    if " M" in value or "公尺" in value:
-                        value = int(''.join(c for c in i[14] if c.isdigit())) / 1000
+                    if "公里" in unit or "KM" in unit.upper():
+                        unit = LENGTH_KILOMETERS
+                    if "公尺" in unit or "M" in unit.upper():
+                        unit = LENGTH_METERS
+                    if "Over" in unit and " KM" in unit:
+                        unit = LENGTH_KILOMETERS
+                    if " M" in i[14] or "公尺" in i[14]:
+                        value = float(''.join(c for c in i[14] if c.isdigit())) / 1000.0
                     else:
-                        value = int(''.join(c for c in i[14] if c.isdigit()))
-                    observation.visibility = Element("W", value=value, units=unit)
+                        value = float(''.join(c for c in i[14] if c.isdigit()))
+                    if "公里以上" in unit or "Over " in unit:
+                        value = value + 1
+                    observation.visibility = Element("W", value=value, units=unit.lstrip().strip())
                     for k in metar:
                         if "/" in k:
                             observation.dew_point = Element("T", value=k.split("/")[1])
