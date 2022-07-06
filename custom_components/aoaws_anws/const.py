@@ -91,6 +91,7 @@ WEATHER_CODES = {
     "Overcast": "8",
     "Mist ": "8",
     "VCTS Mist": "9",
+    "VCTS VCSH ": "9",
     "Shower Mist": "10",
     "Drizzle": "11",
     "Rain": "12",
