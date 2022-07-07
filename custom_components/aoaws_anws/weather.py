@@ -1,6 +1,6 @@
 """Support for ANWS AOAWS service."""
 from homeassistant.components.weather import WeatherEntity
-from homeassistant.const import LENGTH_KILOMETERS, TEMP_CELSIUS
+from homeassistant.const import TEMP_CELSIUS
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
 
@@ -58,79 +58,10 @@ class AnwsAoawsWeather(WeatherEntity):
     @property
     def condition(self):
         """Return the current condition."""
-        return (
-            [
-                k
-                for k, v in CONDITION_CLASSES.items()
-                if self.anws_aoaws_now.weather.value in v
-            ][0]
-            if self.anws_aoaws_now
-            else None
-        )
-
-    @property
-    def temperature(self):
-        """Return the platform temperature."""
-        return (
-            self.anws_aoaws_now.temperature.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.temperature
-            else None
-        )
-
-    @property
-    def temperature_unit(self):
-        """Return the unit of measurement."""
-        return TEMP_CELSIUS
-
-    @property
-    def visibility(self):
-        """Return the platform visibility."""
-        return (
-            self.anws_aoaws_now.visibility.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.visibility
-            else None
-        )
-
-    @property
-    def visibility_unit(self):
-        """Return the unit of measurement."""
-        return self.anws_aoaws_now.visibility.units
-
-    @property
-    def pressure(self):
-        """Return the mean sea-level pressure."""
-        return (
-            self.anws_aoaws_now.pressure.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.pressure
-            else None
-        )
-
-    @property
-    def humidity(self):
-        """Return the relative humidity."""
-        return (
-            self.anws_aoaws_now.humidity.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.humidity
-            else None
-        )
-
-    @property
-    def wind_speed(self):
-        """Return the wind speed."""
-        return (
-            self.anws_aoaws_now.wind_speed.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.wind_speed
-            else None
-        )
-
-    @property
-    def wind_bearing(self):
-        """Return the wind bearing."""
-        return (
-            self.anws_aoaws_now.wind_direction.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.wind_direction
-            else None
-        )
+        for k, v in CONDITION_CLASSES.items():
+            if self.anws_aoaws_now.weather.value.lower().strip() in v:
+                return k
+        return None
 
     @property
     def attribution(self):
@@ -148,6 +79,40 @@ class AnwsAoawsWeather(WeatherEntity):
     def _update_callback(self) -> None:
         """Load data from integration."""
         self.anws_aoaws_now = self._data.now
+        self._attr_temperature_unit = self.anws_aoaws_now.temperature.units
+#        self._attr_visibility_unit = self.anws_aoaws_now.visibility.units
+        self._attr_wind_speed_unit = self.anws_aoaws_now.wind_speed.units
+        self._attr_temperature = (
+            self.anws_aoaws_now.temperature.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.temperature
+            else None
+        )
+        self._attr_pressure = (
+            self.anws_aoaws_now.pressure.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.pressure
+            else None
+        )
+        self._attr_wind_speed = (
+            self.anws_aoaws_now.wind_speed.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.wind_speed
+            else None
+        )
+        self._attr_visibility =  (
+            self.anws_aoaws_now.visibility.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.visibility
+            else None
+        )
+        self._attr_humidity = (
+            self.anws_aoaws_now.humidity.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.humidity
+            else None
+        )
+        self._attr_wind_bearing =  (
+            self.anws_aoaws_now.wind_direction.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.wind_direction
+            else None
+        )
+
         self.async_write_ha_state()
 
     @property

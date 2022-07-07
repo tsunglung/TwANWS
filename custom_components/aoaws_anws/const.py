@@ -35,6 +35,7 @@ ATTR_LAST_UPDATE = "last_update"
 ATTR_SENSOR_ID = "sensor_id"
 ATTR_SITE_ID = "site_id"
 ATTR_SITE_NAME = "site_name"
+ATTR_WEATHER_TEXT = "weather"
 CONF_LANGUAGE = "language"
 CONF_LOCATION_NAME = "location_name"
 CONFIG_FLOW_VERSION = 1
@@ -80,56 +81,86 @@ LANGUAGES = [
     "tw",
 ]
 
-WEATHER_CODES = {
-    "Clear": "0",
-    "Sunny": "1",
-    "Partly Cloudy": "3",
-    "Mostly Cloudy": "4",
-    "Mist": "5",
-    "Fog": "6",
-    "Cloudy": "7",
-    "Overcast": "8",
-    "Mist ": "8",
-    "VCTS Mist": "9",
-    "VCTS VCSH ": "9",
-    "Shower Mist": "10",
-    "Drizzle": "11",
-    "Rain": "12",
-    "Heavy rain shower": "13",
-    "Heavy rain shower ": "14",
-    "Heavy rain": "15",
-    "Sleet shower": "16",
-    "Sleet shower ": "17",
-    "Sleet": "18",
-    "Hail shower": "19",
-    "Hail shower ": "20",
-    "Hail": "21",
-    "Shower": "22",
-    "Light snow shower": "23",
-    "Light snow": "23",
-    "Heavy snow shower": "25",
-    "Heavy snow shower ": "26",
-    "Heavy snow": "27",
-    "Thunder shower": "28",
-    "Thunder shower ": "29",
-    "Thunder": "30"
-}
-
 CONDITION_CLASSES = {
-    ATTR_CONDITION_CLOUDY: ["3", "4"],
-    ATTR_CONDITION_FOG: ["5", "6"],
-    ATTR_CONDITION_HAIL: ["19", "20", "21"],
-    ATTR_CONDITION_LIGHTNING: ["30"],
-    ATTR_CONDITION_LIGHTNING_RAINY: ["28", "29"],
-    ATTR_CONDITION_PARTLYCLOUDY: ["2", "3"],
-    ATTR_CONDITION_POURING: ["13", "14", "15"],
-    ATTR_CONDITION_RAINY: ["8", "9", "10", "11", "12"],
-    ATTR_CONDITION_SNOWY: ["22", "23", "24", "25", "26", "27"],
-    ATTR_CONDITION_SNOWY_RAINY: ["16", "17", "18"],
-    ATTR_CONDITION_SUNNY: ["0", "1"],
-    ATTR_CONDITION_WINDY: [],
-    ATTR_CONDITION_WINDY_VARIANT: [],
-    ATTR_CONDITION_EXCEPTIONAL: [],
+    ATTR_CONDITION_EXCEPTIONAL: [
+        "tornado",
+        "hurricane conditions",
+        "tropical storm conditions",
+        "dust",
+        "smoke",
+        "haze",
+        "hot",
+        "cold",
+    ],
+    ATTR_CONDITION_SNOWY: [
+        "snow",
+        "sleet",
+        "snow/sleet",
+        "blizzard",
+        "light snow",
+        "light snow shower",
+        "heavy snow",
+        "heavy snow shower"
+    ],
+    ATTR_CONDITION_SNOWY_RAINY: [
+        "rain/snow",
+        "rain/sleet",
+        "freezing rain/snow",
+        "freezing rain",
+        "rain/freezing rain",
+    ],
+    ATTR_CONDITION_HAIL: [
+        "hail",
+        "hail shower"
+    ],
+    ATTR_CONDITION_LIGHTNING_RAINY: [
+        "thunder shower",
+        "thunderstorm (high cloud cover)",
+        "thunderstorm (medium cloud cover)",
+        "thunderstorm (low cloud cover)",
+    ],
+    ATTR_CONDITION_LIGHTNING: [
+        "thunder"
+    ],
+    ATTR_CONDITION_POURING: [
+        "heavy rain shower",
+        "heavy rain"
+    ],
+    ATTR_CONDITION_RAINY: [
+        "rain",
+        "rain showers (high cloud cover)",
+        "rain showers (low cloud cover)",
+        "vcts",
+        "vcsh",
+        "vcts vcsh"
+    ],
+    ATTR_CONDITION_WINDY_VARIANT: [
+        "mostly cloudy and windy",
+        "overcast and windy"
+    ],
+    ATTR_CONDITION_WINDY: [
+        "fair/clear and windy",
+        "a few clouds and windy",
+        "partly cloudy and windy",
+    ],
+    ATTR_CONDITION_FOG: [
+        "fog",
+        "mist",
+        "fog/mist"
+    ],
+    "clear": [
+        "clear",
+        "fair",
+        "fair/clear"
+    ],  # sunny and clear-night
+    ATTR_CONDITION_CLOUDY: [
+        "mostly cloudy",
+        "overcast"
+    ],
+    ATTR_CONDITION_PARTLYCLOUDY: [
+        "a few clouds",
+        "partly cloudy"
+    ],
 }
 
 VISIBILITY_CLASSES = {

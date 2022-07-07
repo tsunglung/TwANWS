@@ -8,8 +8,8 @@ from .const import (
     ATTRIBUTION,
     ATTR_LAST_UPDATE,
     ATTR_SENSOR_ID,
-    ATTR_SITE_ID,
     ATTR_SITE_NAME,
+    ATTR_WEATHER_TEXT,
     CONDITION_CLASSES,
     DOMAIN,
     ANWS_AOAWS_COORDINATOR,
@@ -18,8 +18,6 @@ from .const import (
     SENSOR_TYPES,
     VISIBILITY_CLASSES
 )
-import logging
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -81,11 +79,10 @@ class AnwsAoawsCurrentSensor(SensorEntity):
                     break
 
         elif self._type == "weather" and hasattr(self.anws_aoaws_now, self._type):
-            value = [
-                k
-                for k, v in CONDITION_CLASSES.items()
-                if self.anws_aoaws_now.weather.value in v
-            ][0]
+            for k, v in CONDITION_CLASSES.items():
+                if self.anws_aoaws_now.weather.value.lower().strip() in v:
+                    return k
+            return None
 
         elif hasattr(self.anws_aoaws_now, self._type):
             value = getattr(self.anws_aoaws_now, self._type)
@@ -122,14 +119,16 @@ class AnwsAoawsCurrentSensor(SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
-        return {
+        attr =  {
             ATTR_ATTRIBUTION: ATTRIBUTION,
             ATTR_LAST_UPDATE: self.anws_aoaws_now.date if self.anws_aoaws_now else None,
             ATTR_SENSOR_ID: self._type,
-            ATTR_SITE_NAME: self.anws_aoaws_site_name
-            if self.anws_aoaws_site_name
-            else None,
+            ATTR_SITE_NAME: self.anws_aoaws_site_name if self.anws_aoaws_site_name else None,
         }
+        if self._type == "weather":
+            attr[ATTR_WEATHER_TEXT] = self.anws_aoaws_now.weather.text
+
+        return attr
 
     async def async_added_to_hass(self) -> None:
         """Set up a listener and load data."""

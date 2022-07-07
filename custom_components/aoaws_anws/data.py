@@ -14,8 +14,6 @@ from homeassistant.const import (
 )
 from .const import (
     BASE_URL,
-    WEATHER_CODES,
-    HA_USER_AGENT,
     REQUEST_TIMEOUT
 )
 
@@ -108,17 +106,16 @@ class AnwsAoawseData:
                         i[10].strip(), "%Y-%m-%d %H:%M %Z") + timedelta(hours=8)).timetuple()))
                     observation.date = datetime.fromtimestamp(
                         timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
                     # wether
                     value = ''.join(c for c in i[16] if c.isalpha() or c.isspace()).strip()
-                    observation.weather = Element("W", value="0", text=i[16])
-                    for k, v in WEATHER_CODES.items():
-                        if value in k:
-                            observation.weather = Element("W", value=v, text=i[16])
-                            break
+                    observation.weather = Element("W", value=value, text=i[15])
+
                     # temperature
                     value = int(''.join(c for c in i[19] if c.isdigit()))
                     unit = ''.join(c for c in i[19] if not c.isdigit())
                     observation.temperature = Element("T", value=value, units=unit)
+
                     # wind speed
                     if 'Gust' in i[13] or '陣風' in i[13]:
                         value = ''.join(c for c in i[13].lstrip().split("陣風").split("Gust")[0] if c.isdigit())
@@ -127,6 +124,7 @@ class AnwsAoawseData:
                         value = int(''.join(c for c in i[13] if c.isdigit()))
                     unit = ''.join(c for c in i[13] if not c.isdigit())
                     observation.wind_speed = Element("W", value=value, units=unit)
+
                     # wind direction
                     if ''.join(c for c in i[12] if c.isdigit()):
                         value = ''.join(c for c in i[12] if c.isdigit())
@@ -135,6 +133,7 @@ class AnwsAoawseData:
                         value = i[12]
                     unit = ''.join(c for c in i[12] if not c.isdigit())
                     observation.wind_direction = Element("W", value=value, units=unit)
+
                     # visibility
                     i[14] = i[14].replace("&nbsp;", " ")
                     unit = ''.join(c for c in i[14] if not c.isdigit())
@@ -149,8 +148,8 @@ class AnwsAoawseData:
                     else:
                         value = float(''.join(c for c in i[14] if c.isdigit()))
                     if "公里以上" in unit or "Over " in unit:
-                        value = value + 1
-                    observation.visibility = Element("W", value=value, units=unit.lstrip().strip())
+                        value = value + 10
+                    observation.visibility = Element("W", value=value, units=unit.strip())
                     for k in metar:
                         if "/" in k:
                             observation.dew_point = Element("T", value=k.split("/")[1])
@@ -177,11 +176,9 @@ class AnwsAoawseData:
 
     def _update_site(self):
         """Return the nearest DataPoint Site to the held latitude/longitude."""
-        headers = {USER_AGENT: HA_USER_AGENT}
         try:
             req = requests.post(
                 self.uri,
-                headers=headers,
                 timeout=REQUEST_TIMEOUT)
 
         except requests.exceptions.RequestException:
