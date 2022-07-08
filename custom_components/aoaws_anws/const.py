@@ -148,7 +148,7 @@ CONDITION_CLASSES = {
         "mist",
         "fog/mist"
     ],
-    "clear": [
+    "Clear": [
         "clear",
         "fair",
         "fair/clear"
