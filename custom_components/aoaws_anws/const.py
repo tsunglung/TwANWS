@@ -148,8 +148,11 @@ CONDITION_CLASSES = {
         "mist",
         "fog/mist"
     ],
-    "Clear": [
+    ATTR_CONDITION_SUNNY: [
         "clear",
+        "sunny"
+    ],
+    "Clear": [
         "fair",
         "fair/clear"
     ],  # sunny and clear-night
