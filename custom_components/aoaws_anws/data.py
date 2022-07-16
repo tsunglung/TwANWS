@@ -117,8 +117,11 @@ class AnwsAoawseData:
                     observation.temperature = Element("T", value=value, units=unit.strip())
 
                     # wind speed
-                    if 'Gust' in i[13] or '陣風' in i[13]:
-                        value = ''.join(c for c in i[13].lstrip().split("陣風").split("Gust")[0] if c.isdigit())
+                    if 'Gust' in i[13]:
+                        value = ''.join(c for c in i[13].lstrip().split("Gust")[0] if c.isdigit())
+                        value = int(value) if len(value) >= 1 else 0
+                    elif '陣風' in i[13]:
+                        value = ''.join(c for c in i[13].lstrip().split("陣風")[0] if c.isdigit())
                         value = int(value) if len(value) >= 1 else 0
                     else:
                         value = int(''.join(c for c in i[13] if c.isdigit()))
