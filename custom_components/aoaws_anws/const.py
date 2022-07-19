@@ -115,6 +115,8 @@ CONDITION_CLASSES = {
     ],
     ATTR_CONDITION_LIGHTNING_RAINY: [
         "thunder shower",
+        "thunderstorm",
+        "vcts shower",
         "thunderstorm (high cloud cover)",
         "thunderstorm (medium cloud cover)",
         "thunderstorm (low cloud cover)",
@@ -128,6 +130,7 @@ CONDITION_CLASSES = {
     ],
     ATTR_CONDITION_RAINY: [
         "rain",
+        "shower",
         "rain showers (high cloud cover)",
         "rain showers (low cloud cover)",
         "vcts",
