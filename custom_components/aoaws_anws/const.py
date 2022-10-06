@@ -135,8 +135,8 @@ CONDITION_CLASSES = {
         "rain showers (low cloud cover)",
         "vcts",
         "vcsh",
-        "drizzle",
-        "vcts vcsh"
+        "vcts vcsh",
+        "drizzle"
     ],
     ATTR_CONDITION_WINDY_VARIANT: [
         "mostly cloudy and windy",

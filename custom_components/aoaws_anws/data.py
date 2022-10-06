@@ -10,7 +10,9 @@ import requests
 from bs4 import BeautifulSoup
 from homeassistant.const import (
     LENGTH_KILOMETERS,
-    LENGTH_METERS
+    LENGTH_METERS,
+    TEMP_CELSIUS,
+    SPEED_KILOMETERS_PER_HOUR
 )
 from .const import (
     BASE_URL,
@@ -113,7 +115,8 @@ class AnwsAoawseData:
 
                     # temperature
                     value = int(''.join(c for c in i[19] if c.isdigit()))
-                    unit = ''.join(c for c in i[19] if not c.isdigit()).replace("&nbsp;", " ")
+                    #unit = ''.join(c for c in i[19] if not c.isdigit()).replace("&nbsp;", " ")
+                    unit = TEMP_CELSIUS
                     observation.temperature = Element("T", value=value, units=unit.strip())
 
                     # wind speed
@@ -125,7 +128,10 @@ class AnwsAoawseData:
                         value = int(value) if len(value) >= 1 else 0
                     else:
                         value = int(''.join(c for c in i[13] if c.isdigit()))
-                    unit = ''.join(c for c in i[13] if not c.isdigit()).replace("&nbsp;", " ")
+                    #unit = ''.join(c for c in i[13] if not c.isdigit()).replace("&nbsp;", " ")
+                    if "浬/時" in unit or "KT" in unit:
+                        value = value * 1.85
+                    unit = SPEED_KILOMETERS_PER_HOUR
                     observation.wind_speed = Element("W", value=value, units=unit.strip())
 
                     # wind direction
