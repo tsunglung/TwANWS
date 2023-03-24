@@ -150,7 +150,8 @@ CONDITION_CLASSES = {
     ATTR_CONDITION_FOG: [
         "fog",
         "mist",
-        "fog/mist"
+        "fog/mist",
+        "drizzle mist"
     ],
     ATTR_CONDITION_SUNNY: [
         "clear",
@@ -158,7 +159,8 @@ CONDITION_CLASSES = {
     ],
     "Clear": [
         "fair",
-        "fair/clear"
+        "fair/clear",
+        "clear"
     ],  # sunny and clear-night
     ATTR_CONDITION_CLOUDY: [
         "mostly cloudy",
