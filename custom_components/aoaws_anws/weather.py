@@ -1,6 +1,5 @@
 """Support for ANWS AOAWS service."""
 from homeassistant.components.weather import WeatherEntity
-from homeassistant.const import TEMP_CELSIUS
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
 

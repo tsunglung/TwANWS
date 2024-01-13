@@ -1,14 +1,13 @@
 """Constants for ANWS AOAWS Integration."""
 from datetime import timedelta
 from homeassistant.const import (
-    DEVICE_CLASS_HUMIDITY,
-    DEVICE_CLASS_TEMPERATURE,
-    LENGTH_KILOMETERS,
+    UnitOfLength,
     PERCENTAGE,
-    SPEED_MILES_PER_HOUR,
-    TEMP_CELSIUS,
+    UnitOfSpeed,
+    UnitOfTemperature,
     UV_INDEX,
 )
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.weather import (
     ATTR_CONDITION_CLOUDY,
     ATTR_CONDITION_EXCEPTIONAL,
@@ -151,7 +150,8 @@ CONDITION_CLASSES = {
         "fog",
         "mist",
         "fog/mist",
-        "drizzle mist"
+        "drizzle mist",
+        "rain mist"
     ],
     ATTR_CONDITION_SUNNY: [
         "clear",
@@ -193,7 +193,7 @@ SENSOR_TYPES = {
         "mdi:weather-sunny",  # but will adapt to current conditions
         True,
     ],
-    "temperature": ["Temperature", DEVICE_CLASS_TEMPERATURE, TEMP_CELSIUS, None, True],
+    "temperature": ["Temperature", SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS, None, True],
     "wind_speed": [
         "Wind Speed",
         None,
@@ -207,7 +207,7 @@ SENSOR_TYPES = {
     "visibility_distance": [
         "Visibility Distance",
         None,
-        LENGTH_KILOMETERS,
+        UnitOfLength.KILOMETERS,
         "mdi:eye",
         True,
     ],
@@ -219,5 +219,5 @@ SENSOR_TYPES = {
     #     "mdi:weather-rainy",
     #     False,
     # ],
-    # "humidity": ["Humidity", DEVICE_CLASS_HUMIDITY, PERCENTAGE, None, False],
+    # "humidity": ["Humidity", SensorDeviceClass.HUMIDITY, PERCENTAGE, None, False],
 }

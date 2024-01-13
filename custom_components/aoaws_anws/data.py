@@ -9,10 +9,9 @@ from aiohttp.hdrs import USER_AGENT
 import requests
 from bs4 import BeautifulSoup
 from homeassistant.const import (
-    LENGTH_KILOMETERS,
-    LENGTH_METERS,
-    TEMP_CELSIUS,
-    SPEED_KILOMETERS_PER_HOUR
+    UnitOfLength,
+    UnitOfTemperature,
+    UnitOfSpeed
 )
 from .const import (
     BASE_URL,
@@ -116,7 +115,7 @@ class AnwsAoawseData:
                     # temperature
                     value = int(''.join(c for c in i[19] if c.isdigit()))
                     #unit = ''.join(c for c in i[19] if not c.isdigit()).replace("&nbsp;", " ")
-                    unit = TEMP_CELSIUS
+                    unit = UnitOfTemperature.CELSIUS
                     observation.temperature = Element("T", value=value, units=unit.strip())
 
                     # wind speed
@@ -131,7 +130,7 @@ class AnwsAoawseData:
                     #unit = ''.join(c for c in i[13] if not c.isdigit()).replace("&nbsp;", " ")
                     if "浬/時" in unit or "KT" in unit:
                         value = value * 1.85
-                    unit = SPEED_KILOMETERS_PER_HOUR
+                    unit = UnitOfSpeed.KILOMETERS_PER_HOUR
                     observation.wind_speed = Element("W", value=value, units=unit.strip())
 
                     # wind direction
@@ -147,11 +146,11 @@ class AnwsAoawseData:
                     i[14] = i[14].replace("&nbsp;", " ")
                     unit = ''.join(c for c in i[14] if not c.isdigit()).replace("&nbsp;", " ")
                     if "公里" in unit or "KM" in unit.upper():
-                        unit = LENGTH_KILOMETERS
+                        unit = UnitOfLength.KILOMETERS
                     if "公尺" in unit or "M" in unit.upper():
-                        unit = LENGTH_METERS
+                        unit = UnitOfLength.METERS
                     if "Over" in unit and " KM" in unit:
-                        unit = LENGTH_KILOMETERS
+                        unit = UnitOfLength.KILOMETERS
                     if " M" in i[14] or "公尺" in i[14]:
                         value = float(''.join(c for c in i[14] if c.isdigit())) / 1000.0
                     else:
