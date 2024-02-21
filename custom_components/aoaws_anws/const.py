@@ -5,6 +5,7 @@ from homeassistant.const import (
     PERCENTAGE,
     UnitOfSpeed,
     UnitOfTemperature,
+    UnitOfPressure,
     UV_INDEX,
 )
 from homeassistant.components.sensor import SensorDeviceClass
@@ -41,7 +42,7 @@ CONFIG_FLOW_VERSION = 1
 UPDATE_LISTENER = "update_listener"
 PLATFORMS = ["sensor", "weather"]
 
-DEFAULT_SCAN_INTERVAL = timedelta(minutes=15)
+DEFAULT_SCAN_INTERVAL = timedelta(minutes=5)
 
 ANWS_AOAWS_DATA = "anws_aoaws_data"
 ANWS_AOAWS_COORDINATOR = "anws_aoaws_coordinator"
@@ -210,6 +211,20 @@ SENSOR_TYPES = {
         UnitOfLength.KILOMETERS,
         "mdi:eye",
         True,
+    ],
+    "pressure": [
+        "Air Pressure",
+        SensorDeviceClass.ATMOSPHERIC_PRESSURE,
+        UnitOfPressure.HPA,
+        "mdi:gauge",
+        True
+    ],
+    "dew_point": [
+        "Dew Point",
+        SensorDeviceClass.TEMPERATURE,
+        UnitOfTemperature.CELSIUS,
+        None,
+        True
     ],
     # "uv": ["UV Index", None, UV_INDEX, "mdi:weather-sunny-alert", False],
     # "precipitation": [

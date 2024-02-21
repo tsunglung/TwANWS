@@ -1,8 +1,9 @@
-"""Support for ANWS AOAWS service."""
-from homeassistant.components.weather import WeatherEntity
+"""Support for Taiwan ANWS service."""
+from homeassistant.components.weather import WeatherEntityFeature, SingleCoordinatorWeatherEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
 
+from . import device_info
 from .const import (
     ATTRIBUTION,
     CONDITION_CLASSES,
@@ -17,13 +18,13 @@ from .const import (
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: ConfigType, async_add_entities
 ) -> None:
-    """Set up the Anws Aoaws weather sensor platform."""
+    """Set up the Taiwan ANWS weather sensor platform."""
     hass_data = hass.data[DOMAIN][config_entry.entry_id]
 
     async_add_entities(
         [
             AnwsAoawsWeather(
-                config_entry.data,
+                config_entry,
                 hass_data,
             )
         ],
@@ -31,16 +32,18 @@ async def async_setup_entry(
     )
 
 
-class AnwsAoawsWeather(WeatherEntity):
+class AnwsAoawsWeather(SingleCoordinatorWeatherEntity):
     """Implementation of a Anws Aoaws weather condition."""
+    _attr_supported_features = WeatherEntityFeature.FORECAST_HOURLY
 
-    def __init__(self, entry_data, hass_data):
+    def __init__(self, config_entry, hass_data):
         """Initialise the platform with a data instance."""
         self._data = hass_data[ANWS_AOAWS_DATA]
         self._coordinator = hass_data[ANWS_AOAWS_COORDINATOR]
 
         self._name = f"{DEFAULT_NAME} {hass_data[ANWS_AOAWS_NAME]}"
         self._unique_id = f"{self._data.site_name}"
+        self._attr_device_info = device_info(config_entry)
 
         self.anws_aoaws_now = None
 
@@ -66,8 +69,8 @@ class AnwsAoawsWeather(WeatherEntity):
     def cloud_coverage(self) -> float | None:
         """Return the Cloud coverage in %."""
         return (
-            self.anws_aoaws_now.visibility.value
-            if self.anws_aoaws_now and self.anws_aoaws_now.visibility
+            self.anws_aoaws_now.cloud_coverage.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.cloud_coverage
             else None
         )
 
@@ -110,12 +113,20 @@ class AnwsAoawsWeather(WeatherEntity):
     @property
     def native_dew_point(self) -> float | None:
         """Return the dew point."""
-        return None
+        return (
+            self.anws_aoaws_now.dew_point.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.dew_point
+            else None
+        )
 
     @property
     def native_wind_gust_speed(self) -> float | None:
         """Return the wind gust speed."""
-        return None
+        return (
+            self.anws_aoaws_now.wind_speed.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.wind_speed
+            else None
+        )
 
     @property
     def native_wind_speed(self) -> float | None:

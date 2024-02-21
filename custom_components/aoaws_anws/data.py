@@ -51,6 +51,8 @@ class Observation:
         self.pressure = None
         self.pressure_tendency = None
         self.dew_point = None
+        self.cloud_coverage = None
+        self.cloud_ceiling = None
 
     def __iter__(self):
         for attr, value in self.__dict__.items():
@@ -116,6 +118,7 @@ class AnwsAoawseData:
                     value = int(''.join(c for c in i[19] if c.isdigit()))
                     #unit = ''.join(c for c in i[19] if not c.isdigit()).replace("&nbsp;", " ")
                     unit = UnitOfTemperature.CELSIUS
+                    temperature = value
                     observation.temperature = Element("T", value=value, units=unit.strip())
 
                     # wind speed
@@ -159,10 +162,15 @@ class AnwsAoawseData:
                         value = value + 10
                     observation.visibility = Element("W", value=value, units=unit.strip())
                     for k in metar:
-                        if "/" in k:
+                        if "/" in k and temperature == int(k.split("/")[0]):
                             observation.dew_point = Element("T", value=k.split("/")[1])
                         if len(k) >= 1 and "Q" == k[0]:
                             observation.pressure = Element("P", value=k[1:])
+
+                    # cloud ceiling
+                    value = ''.join(c for c in i[18].replace("&nbsp;", " ") if c.isalpha() or c.isspace()).strip()
+                    unit = ''.join(c for c in i[18].replace("&nbsp;", " ") if not c.isdigit())
+                    observation.cloud_ceiling  = Element("W", value=value, units=unit.strip())
 
                     return observation
         return None

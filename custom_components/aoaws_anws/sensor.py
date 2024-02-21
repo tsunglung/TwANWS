@@ -1,9 +1,10 @@
-"""Support for UK Met Office weather service."""
+"""Support for Taiwan ANWS weather service."""
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import ATTR_ATTRIBUTION
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
 
+from . import device_info
 from .const import (
     ATTRIBUTION,
     ATTR_LAST_UPDATE,
@@ -23,12 +24,12 @@ from .const import (
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigType, async_add_entities
 ) -> None:
-    """Set up the Met Office weather sensor platform."""
+    """Set up the Taiwan ANWS weather sensor platform."""
     hass_data = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
         [
-            AnwsAoawsCurrentSensor(entry.data, hass_data, sensor_type)
+            AnwsAoawsCurrentSensor(entry, hass_data, sensor_type)
             for sensor_type in SENSOR_TYPES
         ],
         False,
@@ -36,9 +37,9 @@ async def async_setup_entry(
 
 
 class AnwsAoawsCurrentSensor(SensorEntity):
-    """Implementation of a Met Office current weather condition sensor."""
+    """Implementation of a Taiwan ANWS current weather condition sensor."""
 
-    def __init__(self, entry_data, hass_data, sensor_type):
+    def __init__(self, config_entry, hass_data, sensor_type):
         """Initialize the sensor."""
         self._data = hass_data[ANWS_AOAWS_DATA]
         self._coordinator = hass_data[ANWS_AOAWS_COORDINATOR]
@@ -46,6 +47,7 @@ class AnwsAoawsCurrentSensor(SensorEntity):
         self._type = sensor_type
         self._name = f"{hass_data[ANWS_AOAWS_NAME]} {SENSOR_TYPES[self._type][0]}"
         self._unique_id = f"{SENSOR_TYPES[self._type][0]}_{self._data.site_name}"
+        self._attr_device_info = device_info(config_entry)
 
         self.anws_aoaws_site_id = None
         self.anws_aoaws_site_name = None

@@ -1,4 +1,4 @@
-"""The ANWS AOAWS integration."""
+"""The Taiwan ANWS integration."""
 import asyncio
 import logging
 
@@ -7,6 +7,7 @@ from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CON
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 
 from .const import (
     CONF_LANGUAGE,
@@ -95,3 +96,13 @@ def _get_config_value(config_entry, key, default):
     if config_entry.options:
         return config_entry.options.get(key, default)
     return config_entry.data.get(key, default)
+
+def device_info(config_entry: ConfigEntry) -> DeviceInfo:
+    """Build and return the device info for EC."""
+    return DeviceInfo(
+        entry_type=DeviceEntryType.SERVICE,
+        identifiers={(DOMAIN, config_entry.entry_id)},
+        manufacturer="Taiwan ANWS",
+        name=config_entry.title,
+        configuration_url="https://aoaws.anws.gov.tw/AWS",
+    )
