@@ -63,6 +63,79 @@ class AnwsAoawsWeather(WeatherEntity):
         return None
 
     @property
+    def cloud_coverage(self) -> float | None:
+        """Return the Cloud coverage in %."""
+        return (
+            self.anws_aoaws_now.visibility.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.visibility
+            else None
+        )
+
+    @property
+    def native_apparent_temperature(self) -> float | None:
+        """Return the apparent temperature."""
+        return (
+            self.anws_aoaws_now.temperature.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.temperature
+            else None
+        )
+
+    @property
+    def native_temperature(self) -> float | None:
+        """Return the temperature."""
+        return (
+            self.anws_aoaws_now.temperature.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.temperature
+            else None
+        )
+
+    @property
+    def native_pressure(self) -> float | None:
+        """Return the pressure."""
+        return (
+            self.anws_aoaws_now.pressure.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.pressure
+            else None
+        )
+
+    @property
+    def humidity(self) -> float | None:
+        """Return the humidity."""
+        return (
+            self.anws_aoaws_now.humidity.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.humidity
+            else None
+        )
+
+    @property
+    def native_dew_point(self) -> float | None:
+        """Return the dew point."""
+        return None
+
+    @property
+    def native_wind_gust_speed(self) -> float | None:
+        """Return the wind gust speed."""
+        return None
+
+    @property
+    def native_wind_speed(self) -> float | None:
+        """Return the wind speed."""
+        return (
+            self.anws_aoaws_now.wind_speed.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.wind_speed
+            else None
+        )
+
+    @property
+    def wind_bearing(self) -> float | str | None:
+        """Return the wind bearing."""
+        return (
+            self.anws_aoaws_now.wind_direction.value
+            if self.anws_aoaws_now and self.anws_aoaws_now.wind_direction
+            else None
+        )
+
+    @property
     def attribution(self):
         """Return the attribution."""
         return ATTRIBUTION
