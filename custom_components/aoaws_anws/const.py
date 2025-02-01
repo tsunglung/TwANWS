@@ -152,7 +152,8 @@ CONDITION_CLASSES = {
         "mist",
         "fog/mist",
         "drizzle mist",
-        "rain mist"
+        "rain mist",
+        "vcsh mist"
     ],
     ATTR_CONDITION_SUNNY: [
         "clear",
