@@ -20,12 +20,14 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Taiwan ANWS weather sensor platform."""
     hass_data = hass.data[DOMAIN][config_entry.entry_id]
+    weather_coordinator = hass_data[ANWS_AOAWS_COORDINATOR]
 
     async_add_entities(
         [
             AnwsAoawsWeather(
                 config_entry,
                 hass_data,
+                weather_coordinator
             )
         ],
         False,
@@ -36,10 +38,11 @@ class AnwsAoawsWeather(SingleCoordinatorWeatherEntity):
     """Implementation of a Anws Aoaws weather condition."""
     _attr_supported_features = WeatherEntityFeature.FORECAST_HOURLY
 
-    def __init__(self, config_entry, hass_data):
+    def __init__(self, config_entry, hass_data, coordinator):
         """Initialise the platform with a data instance."""
+        super().__init__(coordinator)
         self._data = hass_data[ANWS_AOAWS_DATA]
-        self._coordinator = hass_data[ANWS_AOAWS_COORDINATOR]
+        self._coordinator = coordinator
 
         self._name = f"{DEFAULT_NAME} {hass_data[ANWS_AOAWS_NAME]}"
         self._unique_id = f"{self._data.site_name}"
