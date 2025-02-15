@@ -162,8 +162,8 @@ class AnwsAoawseData:
                         value = value + 10
                     observation.visibility = Element("W", value=value, units=unit.strip())
                     for k in metar:
-                        if "/" in k and temperature == int(k.split("/")[0]):
-                            observation.dew_point = Element("T", value=k.split("/")[1])
+                        if re.search(r"\d+\/\d+", k) and temperature == int(k.split("/")[0]):
+                            observation.dew_point = Element("T", value=k.split("/", 1)[1])
                         if len(k) >= 1 and "Q" == k[0]:
                             observation.pressure = Element("P", value=k[1:])
 
