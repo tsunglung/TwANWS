@@ -2,6 +2,7 @@
 from homeassistant.components.weather import WeatherEntityFeature, SingleCoordinatorWeatherEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.const import UnitOfTemperature, UnitOfSpeed
 
 from . import device_info
 from .const import (
@@ -165,9 +166,9 @@ class AnwsAoawsWeather(SingleCoordinatorWeatherEntity):
     def _update_callback(self) -> None:
         """Load data from integration."""
         self.anws_aoaws_now = self._data.now
-        self._attr_temperature_unit = self.anws_aoaws_now.temperature.units
+        self._attr_temperature_unit = self.anws_aoaws_now.temperature.units if self.anws_aoaws_now.temperature else UnitOfTemperature.CELSIUS
 #        self._attr_visibility_unit = self.anws_aoaws_now.visibility.units
-        self._attr_wind_speed_unit = self.anws_aoaws_now.wind_speed.units
+        self._attr_wind_speed_unit = self.anws_aoaws_now.wind_speed.units if self.anws_aoaws_now.wind_speed else UnitOfSpeed.KILOMETERS_PER_HOUR
         self._attr_temperature = (
             self.anws_aoaws_now.temperature.value
             if self.anws_aoaws_now and self.anws_aoaws_now.temperature
