@@ -3,7 +3,7 @@
   "name": "Taiwan Navigation Weather Services (NWS)",
   "documentation": "https://github.com/tsunglung/TwANWS",
   "issue_tracker": "https://github.com/tsunglung/TwANWS/issues",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "requirements": ["bs4"],
   "codeowners": ["@tsunglung"],
   "config_flow": true,
