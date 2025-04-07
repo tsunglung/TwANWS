@@ -128,6 +128,8 @@ class AnwsAoawseData:
                     elif '陣風' in i[13]:
                         value = ''.join(c for c in i[13].lstrip().split("陣風")[0] if c.isdigit())
                         value = int(value) if len(value) >= 1 else 0
+                    elif '靜風' in i[13]:
+                        value = 0
                     else:
                         value = int(''.join(c for c in i[13] if c.isdigit()))
                     #unit = ''.join(c for c in i[13] if not c.isdigit()).replace("&nbsp;", " ")
