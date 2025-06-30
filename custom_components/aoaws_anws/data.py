@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from http import HTTPStatus
 from aiohttp.hdrs import USER_AGENT
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 from bs4 import BeautifulSoup
 from homeassistant.const import (
     UnitOfLength,
@@ -194,10 +196,14 @@ class AnwsAoawseData:
 
     def _update_site(self):
         """Return the nearest DataPoint Site to the held latitude/longitude."""
+
+        # Suppress the InsecureRequestWarning
+        requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
         try:
             req = requests.post(
                 self.uri,
-                timeout=REQUEST_TIMEOUT)
+                timeout=REQUEST_TIMEOUT,
+                verify=False)
 
         except requests.exceptions.RequestException:
             _LOGGER.error("Failed fetching data for %s", self.site_name)
