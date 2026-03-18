@@ -1,5 +1,22 @@
 """Support for Taiwan ANWS service."""
-from homeassistant.components.weather import WeatherEntityFeature, SingleCoordinatorWeatherEntity
+from homeassistant.components.weather import (
+    ATTR_FORECAST_CLOUD_COVERAGE,
+    ATTR_FORECAST_CONDITION,
+    ATTR_FORECAST_HUMIDITY,
+    ATTR_FORECAST_NATIVE_APPARENT_TEMP,
+    ATTR_FORECAST_NATIVE_PRECIPITATION,
+    ATTR_FORECAST_NATIVE_TEMP,
+    ATTR_FORECAST_NATIVE_TEMP_LOW,
+    ATTR_FORECAST_NATIVE_WIND_GUST_SPEED,
+    ATTR_FORECAST_NATIVE_WIND_SPEED,
+    ATTR_FORECAST_PRECIPITATION_PROBABILITY,
+    ATTR_FORECAST_TIME,
+    ATTR_FORECAST_UV_INDEX,
+    ATTR_FORECAST_WIND_BEARING,
+    Forecast,
+    SingleCoordinatorWeatherEntity,
+    WeatherEntityFeature
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.const import UnitOfTemperature, UnitOfSpeed
@@ -50,6 +67,8 @@ class AnwsAoawsWeather(SingleCoordinatorWeatherEntity):
         self._attr_device_info = device_info(config_entry)
 
         self.anws_aoaws_now = None
+        self.anws_aoaws_forecast = None
+        self.forecast_type = "hourly"
 
     @property
     def name(self):
@@ -166,8 +185,8 @@ class AnwsAoawsWeather(SingleCoordinatorWeatherEntity):
     def _update_callback(self) -> None:
         """Load data from integration."""
         self.anws_aoaws_now = self._data.now
+        self.anws_aoaws_forecast = self._data.forecast
         self._attr_temperature_unit = self.anws_aoaws_now.temperature.units if self.anws_aoaws_now.temperature else UnitOfTemperature.CELSIUS
-#        self._attr_visibility_unit = self.anws_aoaws_now.visibility.units
         self._attr_wind_speed_unit = self.anws_aoaws_now.wind_speed.units if self.anws_aoaws_now.wind_speed else UnitOfSpeed.KILOMETERS_PER_HOUR
         self._attr_temperature = (
             self.anws_aoaws_now.temperature.value
@@ -211,3 +230,22 @@ class AnwsAoawsWeather(SingleCoordinatorWeatherEntity):
     def available(self):
         """Return if state is available."""
         return self.anws_aoaws_now is not None
+
+    @callback
+    def _async_forecast_hourly(self) -> list[Forecast] | None:
+        """Return the hourly forecast in native units."""
+
+        if self.anws_aoaws_forecast:
+            forecast_data: list[Forecast] = []
+            for item in self.anws_aoaws_forecast:
+                forecast_data.append(
+                    {
+                        ATTR_FORECAST_TIME: item.date,
+                        ATTR_FORECAST_NATIVE_TEMP: item.temperature.value,
+                        ATTR_FORECAST_NATIVE_WIND_SPEED: item.wind_speed.value,
+                        ATTR_FORECAST_CONDITION: item.weather.value,
+                        ATTR_FORECAST_WIND_BEARING: item.wind_direction.value
+                    }
+                )
+            return forecast_data
+        return None

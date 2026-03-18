@@ -50,9 +50,11 @@ ANWS_AOAWS_MONITORED_CONDITIONS = "anws_aoaws_monitored_conditions"
 ANWS_AOAWS_NAME = "anws_aoaws_name"
 
 USER_AGENT = ""
+# curl -H "X-Requested-With: XMLHttpRequest" -H "Accept-Language: zh-TW,zh-Hant;q=0.9" -H "Accept: application/json, text/javascript, */*; q=0.01" -H "User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 26_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/146.0.7680.151 Mobile/15E148 Safari/604.1" --compressed "https://aoaws.anws.gov.tw/Home/get_metar_data"
 HA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
     "(KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36 OPR/38.0.2220.41"
-BASE_URL = 'https://aoaws.anws.gov.tw/AWS/mainRight.php?lang={}&voice_alarm=0&state=Taiwan'
+#BASE_URL = 'https://aoaws.anws.gov.tw/AWS/mainRight.php?lang={}&voice_alarm=0&state=Taiwan'
+BASE_URL = 'https://aoaws.anws.gov.tw/Home/get_metar_data'
 
 REQUEST_TIMEOUT = 10  # seconds
 
@@ -165,6 +167,7 @@ CONDITION_CLASSES = {
         "clear"
     ],  # sunny and clear-night
     ATTR_CONDITION_CLOUDY: [
+        "cloudy",
         "mostly cloudy",
         "overcast"
     ],

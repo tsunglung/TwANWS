@@ -5,7 +5,6 @@ import re
 import time
 from datetime import datetime, timedelta
 from http import HTTPStatus
-from aiohttp.hdrs import USER_AGENT
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
@@ -17,6 +16,7 @@ from homeassistant.const import (
 )
 from .const import (
     BASE_URL,
+    HA_USER_AGENT,
     REQUEST_TIMEOUT
 )
 
@@ -84,124 +84,150 @@ class AnwsAoawseData:
         self.site_name = None
         self.language = language
         self.now = None
-        self.uri = BASE_URL.format(language)
+        self.forecast = None
+        self.uri = BASE_URL
 
     async def async_update_site(self):
         """Async wrapper for getting the update."""
         return await self._hass.async_add_executor_job(self._update_site)
 
-    def get_observations_for_site(self, site, data):
+    def get_observation_for_site(self, site, data):
         """ return observation """
-        self._update_site()
         return self._convert_to_observation(site, data)
+
+    def get_observations_for_site(self, site, data):
+        """ return observations """
+        return self._convert_to_observations(site, data)
 
     def _convert_to_observation(self, site, data):
         """ converter  """
+        observation = Observation()
         for i in data:
             for j in i:
-                if j == site:
-                    metar = i[26].split(" ")
-                    for k in range(len(i)):
-                        i[k] = re.sub(
-                            "<font color=\\#999999\\>|<font color=\\\\#999999\\\\>|</font>", "", i[k])
-
-                    observation = Observation()
+                if self._site == j["location_en"]:
                     # date
-                    timestamp = int(time.mktime((datetime.strptime(
-                        i[10].strip(), "%Y-%m-%d %H:%M %Z") + timedelta(hours=8)).timetuple()))
+                    obs_datetime = datetime.strptime(
+                        j["datatime"].strip(), "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=8)
+                    timestamp = int(time.mktime((obs_datetime).timetuple()))
+
                     observation.date = datetime.fromtimestamp(
                         timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
                     # wether
-                    value = ''.join(c for c in i[16] if c.isalpha() or c.isspace()).strip()
-                    observation.weather = Element("W", value=value, text=i[15])
+                    value = ''.join(c for c in j["WEATHER"]["EName"] if c.isalpha() or c.isspace()).strip()
+                    observation.weather = Element("W", value=value)
 
                     # temperature
-                    value = int(''.join(c for c in i[19] if c.isdigit()))
-                    #unit = ''.join(c for c in i[19] if not c.isdigit()).replace("&nbsp;", " ")
+                    value = int(j.get("TEMP", "0"))
                     unit = UnitOfTemperature.CELSIUS
                     temperature = value
                     observation.temperature = Element("T", value=value, units=unit.strip())
 
                     # wind speed
-                    if 'Gust' in i[13]:
-                        value = ''.join(c for c in i[13].lstrip().split("Gust")[0] if c.isdigit())
-                        value = int(value) if len(value) >= 1 else 0
-                    elif '陣風' in i[13]:
-                        value = ''.join(c for c in i[13].lstrip().split("陣風")[0] if c.isdigit())
-                        value = int(value) if len(value) >= 1 else 0
-                    elif '靜風' in i[13]:
-                        value = 0
-                    else:
-                        value = int(''.join(c for c in i[13] if c.isdigit()))
-                    #unit = ''.join(c for c in i[13] if not c.isdigit()).replace("&nbsp;", " ")
-                    if "浬/時" in unit or "KT" in unit:
+                    value = int(j.get("WDSD", "0"))
+                    if "浬/時" in j["WDSD_UNIT"] or "KT" in j["WDSD_UNIT"]:
                         value = value * 1.85
                     unit = UnitOfSpeed.KILOMETERS_PER_HOUR
-                    observation.wind_speed = Element("W", value=value, units=unit.strip())
+                    observation.wind_speed = Element("W", value=value, units=unit)
 
                     # wind direction
-                    if ''.join(c for c in i[12] if c.isdigit()):
-                        value = ''.join(c for c in i[12] if c.isdigit())
-                        value = int(value) if len(value) >= 1 else 0
-                    else:
-                        value = i[12]
-                    unit = ''.join(c for c in i[12] if not c.isdigit()).replace("&nbsp;", " ")
-                    observation.wind_direction = Element("W", value=value, units=unit.strip())
+                    value = int(j.get("WDIR", "0"))
+                    observation.wind_direction = Element("W", value=value)
 
                     # visibility
-                    i[14] = i[14].replace("&nbsp;", " ")
-                    unit = ''.join(c for c in i[14] if not c.isdigit()).replace("&nbsp;", " ")
-                    if "公里" in unit or "KM" in unit.upper():
-                        unit = UnitOfLength.KILOMETERS
-                    if "公尺" in unit or "M" in unit.upper():
-                        unit = UnitOfLength.METERS
-                    if "Over" in unit and " KM" in unit:
-                        unit = UnitOfLength.KILOMETERS
-                    if " M" in i[14] or "公尺" in i[14]:
-                        value = float(''.join(c for c in i[14] if c.isdigit())) / 1000.0
-                    else:
-                        value = float(''.join(c for c in i[14] if c.isdigit()))
-                    if "公里以上" in unit or "Over " in unit:
-                        value = value + 10
-                    observation.visibility = Element("W", value=value, units=unit.strip())
-                    for k in metar:
+                    value = int(j.get("VIS", "0")) / 1000
+                    observation.visibility = Element("W", value=value, units=UnitOfLength.KILOMETERS)
+
+                    # cloud ceiling
+                    value = j.get("CEILING", "")
+                    observation.cloud_ceiling  = Element("W", value=value)
+
+                    for k in j.get("REPORT", "").split():
                         if re.search(r"\d+\/\d+", k) and temperature == int(k.split("/")[0]):
                             observation.dew_point = Element("T", value=k.split("/", 1)[1])
                         if len(k) >= 1 and "Q" == k[0]:
                             observation.pressure = Element("P", value=k[1:])
 
+        return observation
+
+    def _convert_to_observations(self, site, data):
+        """ converter  """
+        observations = []
+        for i in data:
+            for j in i:
+                if self._site == j["location_en"]:
+                    observation = Observation()
+                    # date
+                    timestamp = int(time.mktime((datetime.strptime(
+                        j["datatime"].strip(), "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=8)).timetuple()))
+
+                    observation.date = datetime.fromtimestamp(
+                        timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+                    # wether
+                    value = ''.join(c for c in j["WEATHER"]["EName"] if c.isalpha() or c.isspace()).strip()
+                    observation.weather = Element("W", value=value)
+
+                    # temperature
+                    value = int(j.get("TEMP", "-1"))
+                    unit = UnitOfTemperature.CELSIUS
+                    temperature = value
+                    observation.temperature = Element("T", value=value, units=unit.strip())
+
+                    # wind speed
+                    value = int(j.get("WDSD", "-1"))
+                    if "浬/時" in j["WDSD_UNIT"] or "KT" in j["WDSD_UNIT"]:
+                        value = value * 1.85
+                    unit = UnitOfSpeed.KILOMETERS_PER_HOUR
+                    observation.wind_speed = Element("W", value=value, units=unit)
+
+                    # wind direction
+                    value = int(j.get("WDIR", "-1"))
+                    observation.wind_direction = Element("W", value=value)
+
+                    # visibility
+                    value = int(j.get("VIS", "-1"))
+                    observation.visibility = Element("W", value=value)
+
                     # cloud ceiling
-                    value = ''.join(c for c in i[18].replace("&nbsp;", " ") if c.isalpha() or c.isspace()).strip()
-                    unit = ''.join(c for c in i[18].replace("&nbsp;", " ") if not c.isdigit())
-                    observation.cloud_ceiling  = Element("W", value=value, units=unit.strip())
+                    value = j.get("CEILING", "")
+                    observation.cloud_ceiling  = Element("W", value=value)
 
-                    return observation
-        return None
+                    observations.append(observation)
 
-    def _parser_html(self, text):
-        """ parser html """
-        data = []
-        soup = BeautifulSoup(text, 'html.parser')
-        icaos = soup.find(id="select_icao")
-        if icaos:
-            results = icaos.find_all(language="JavaScript")
-            if results:
-                results2 = [re.sub(
-                    "addarray(|)|'", "", i.string) for i in results]
-                for i in results2:
-                    value = i.split(",")
-                    data.append(value)
-        return data
+        return observations
+
+
+    def _parser_json(self, data):
+        if "airport_list" not in data:
+            _LOGGER.error(f"There is no airport_list")
+            return {}
+        if "Taiwan" not in data["airport_list"]:
+            _LOGGER.error(f"There is no Taiwan in airport_list")
+            return {}
+        new_data = []
+        #for i in data["airport_list"]["Taiwan"]:
+        #    datatime = i["datatime"]
+        #    location_en = i["location_en"]
+
+        return data["airport_list"]["Taiwan"]
+
 
     def _update_site(self):
         """Return the nearest DataPoint Site to the held latitude/longitude."""
 
         # Suppress the InsecureRequestWarning
         requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+        headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': HA_USER_AGENT
+        }
+
         try:
-            req = requests.post(
+            response = requests.post(
                 self.uri,
+                headers=headers,
                 timeout=REQUEST_TIMEOUT,
                 verify=False)
 
@@ -209,12 +235,15 @@ class AnwsAoawseData:
             _LOGGER.error("Failed fetching data for %s", self.site_name)
             return
 
-        if req.status_code == HTTPStatus.OK:
-            self.data = self._parser_html(req.text)
-            for i in self.data:
-                for j in i:
-                    if self._site in j:
-                        self.site_name = self._site
+        if response.status_code == HTTPStatus.OK:
+            try:
+                self.data = self._parser_json(response.json())
+                for i in self.data:
+                    for j in i:
+                        if self._site == j["location_en"]:
+                            self.site_name = self._site
+            except Exception as e:
+                _LOGGER.error(f"Received data error {e}")
         else:
             _LOGGER.error("Received error from ANWS AOAWS: %s", self.site_name)
             self.site_name = None
@@ -233,10 +262,13 @@ class AnwsAoawseData:
             return
 
         try:
-            observations = self.get_observations_for_site(
+            self._update_site()
+            self.now = self.get_observation_for_site(
                 self._site, self.data
             )
-            self.now = observations
+            self.forecast = self.get_observations_for_site(
+                self._site, self.data
+            )
         except (ValueError) as err:
             _LOGGER.error("Check ANWS AOAWS connection: %s", err.args)
             self.now = None
